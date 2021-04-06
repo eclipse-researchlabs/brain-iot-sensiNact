@@ -15,8 +15,8 @@ cache:
 deploy:
   provider: script
   script: 
-    - mvn $MAVEN_CLI_OPTS $MAVEN_DEPLOY_OPTS validate verify clean package org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy -f mock-signature-validator -DskipTests
-    - mvn $MAVEN_CLI_OPTS $MAVEN_DEPLOY_OPTS validate verify clean package clean package org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy -f brainiot-sensinact-gateway 
+    - mvn $MAVEN_CLI_OPTS $MAVEN_DEPLOY_OPTS validate clean package org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy -f mock-signature-validator -DskipTests
+    - mvn $MAVEN_CLI_OPTS $MAVEN_DEPLOY_OPTS validate clean package clean package org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy -f brainiot-sensinact-gateway 
   on:
     branch: main
 
