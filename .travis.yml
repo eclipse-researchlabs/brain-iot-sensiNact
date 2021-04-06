@@ -18,9 +18,10 @@ script:
 
 deploy:
   provider: script
-  script: mvn $MAVEN_CLI_OPTS $MAVEN_DEPLOY_OPTS clean package org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy
+  script: 
+  mvn $MAVEN_CLI_OPTS $MAVEN_DEPLOY_OPTS -f mock-signature-validator clean package org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy
+  mvn $MAVEN_CLI_OPTS $MAVEN_DEPLOY_OPTS -f brainiot-sensinact-gateway clean package org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy
   on:
-    repo: brain-iot-sensiNact/mock-signature-validator
-    repo: brain-iot-sensiNact/brainiot-sensinact-gateway
+    branch: main
 
 #end
