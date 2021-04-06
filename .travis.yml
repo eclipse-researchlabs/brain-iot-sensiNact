@@ -1,5 +1,6 @@
 language: java
 jdk: openjdk8
+sudo: true
 
 env:
   MAVEN_OPTS: "-Dmaven.repo.local=.m2/repository"
