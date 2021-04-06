@@ -28,6 +28,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.io.File;
+
 public class BundleValidationTest {
     private static final Map<String, String> CONFIGURATION = new HashMap<String, String>();
 
@@ -52,7 +54,13 @@ public class BundleValidationTest {
     @Before
     public void init() throws NoSuchAlgorithmException, KeyStoreManagerException, BundleException {
         
-    	
+    	File fle = new File("/tmp/felix");
+    	if(fle.exists())
+    		fle.delete();
+    	fle = new File("/tmp/felix-cache");
+    	if(fle.exists())
+    		fle.delete();
+
     	felix = new FrameworkFactory().newFramework(CONFIGURATION);
         felix.init();
         felix.start();
