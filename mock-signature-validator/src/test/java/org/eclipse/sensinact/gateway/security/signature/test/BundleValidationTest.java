@@ -32,9 +32,9 @@ public class BundleValidationTest {
     private static final Map<String, String> CONFIGURATION = new HashMap<String, String>();
 
     static {
-        CONFIGURATION.put("felix.cache.rootdir", "./target/felix");
-        CONFIGURATION.put("org.osgi.framework.storage", "felix-cache");
-        CONFIGURATION.put("felix.auto.deploy.dir", "./target/felix/bundle");
+        CONFIGURATION.put("felix.cache.rootdir", "/tmp/felix");
+        CONFIGURATION.put("org.osgi.framework.storage", "/tmp/felix-cache");
+        CONFIGURATION.put("felix.auto.deploy.dir", "/tmp/felix/bundle");  
         CONFIGURATION.put("felix.auto.deploy.action", "install,start");
         CONFIGURATION.put("felix.log.level", "4");
         CONFIGURATION.put("org.osgi.framework.system.packages.extra", "org.eclipse.sensinact.gateway.generic.core;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.generic.core.impl;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.generic.core.packet;version=\"2.0.0\"," + "org.eclipse.sensinact.gateway.generic.stream;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.generic.uri;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.generic.parser;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.generic.automata;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.generic.annotation;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.generic.local;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.util;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.util.constraint;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.util.crypto;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.util.json;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.util.mediator;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.util.properties;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.util.reflect;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.util.rest;version= \"2.0.0\"," + "org.eclipse.sensinact.gateway.util.xml;version= \"2.0.0\"," + "json-20140107.jar;version= \"2.0.0\"," + "org.json;version;version= \"2.0.0\"," + "org.json.zip;version=\"2.0.0\"");
