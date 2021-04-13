@@ -16,6 +16,8 @@ import org.junit.Test;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -32,8 +34,15 @@ public class KeyStoreManagerTest {
     String alias = "selfsigned";
     String fake_alias = "notselfsigned";
     String passwd = "sensiNact_team";
-    String falsePasswd = "keyStore";
-    static String defaultKeystoreFile = "./cert/keystore.jks";
+    String falsePasswd = "keyStore"; 
+    static URL defaultKeystoreFile;
+    static {
+    	try {
+			defaultKeystoreFile =  new URL("file:./cert/keystore.jks");
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		}
+    }
 
     @Test
     public void testGetCertificateOK() throws KeyStoreManagerException {

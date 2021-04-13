@@ -54,14 +54,15 @@ public class BundleValidationImpl implements BundleValidation {
 
     @Activate
     public void activate (ComponentContext context) throws KeyStoreManagerException, NoSuchAlgorithmException {
+        this.bundleContext = context.getBundleContext();
         this.validated = Collections.<String, ValidBundleKey>synchronizedMap(new HashMap<>());
         this.cryptoUtils = new CryptographicUtils();
         this.ksm = new KeyStoreManager(this.getKeyStoreFileName(), this.getKeyStorePassword());
-        this.bundleContext = context.getBundleContext();
     }
 
-    protected String getKeyStoreFileName() {
-        return (String) bundleContext.getProperty("org.eclipse.sensinact.gateway.security.jks.filename");
+    protected URL getKeyStoreFileName() {
+        String path = (String) bundleContext.getProperty("org.eclipse.sensinact.gateway.security.jks.filename");
+        return bundleContext.getBundle().getEntry(path);
     }
 
     protected String getKeyStorePassword() {

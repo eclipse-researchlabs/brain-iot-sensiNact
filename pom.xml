@@ -15,7 +15,7 @@
 	
 	<packaging>pom</packaging>
 
-	<description>sensiNact Gateway - Single Bundle Packaging</description>
+	<description>Brain-IoT sensiNact Gateway - Single Bundle Packaging</description>
 
 	<modules>
 		<module>mock-signature-validator</module>

@@ -15,11 +15,15 @@
 		<version>1.0</version>
 	</parent>
 	
-	<artifactId>brainiot-sensinact-gateway</artifactId>
+	<artifactId>sensinact-gateway</artifactId>
 	<packaging>bundle</packaging>
 
-	<description>sensiNact Gateway - Single Bundle Packaging</description>
+	<description>Brain-IoT sensiNact Gateway - Single Bundle Packaging</description>
 
+	<scm>
+		<connection>scm:git:https://git.eclipse.org/r/sensinact/org.eclipse.sensinact.gateway.git</connection>
+	</scm>
+	
 	<dependencies>
 		<dependency>
 			<groupId>org.eclipse.sensinact.gateway.brainiot</groupId>
@@ -27,107 +31,208 @@
 			<version>1.0</version>
 		</dependency>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.30</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>6.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>org.osgi</groupId>
 			<artifactId>osgi.cmpn</artifactId>
 			<version>7.0.0</version>
 			<scope>provided</scope>
+		</dependency>		
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.http.servlet-api</artifactId>
+			<version>1.1.2</version>
+			<scope>provided</scope>
 		</dependency>
-
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.apache.felix.http.jetty</artifactId>
+			<version>4.0.14</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.paho</groupId>
+			<artifactId>org.eclipse.paho.client.mqttv3</artifactId>
+			<version>1.2.2</version>
+		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
-			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-antrun-plugin</artifactId>
-			    <version>1.8</version>
-			    <executions>
-			        <execution>
-			            <id>download-files</id>
-			            <phase>validate</phase>
-			            <goals>
-			                <goal>run</goal>
-			            </goals>
-			            <configuration>
-		            		<target>
-		            		    <get src="https://ftp.fau.de/eclipse/sensinact/gateway/snapshot/sensiNact-gateway-2.0-SNAPSHOT-latest.zip"
-		                         dest="${project.build.directory}/"
-		                         verbose="false"
-		                         usetimestamp="true"/>
-		                        <unzip src="${project.build.directory}/sensiNact-gateway-2.0-SNAPSHOT-latest.zip" dest="${project.build.directory}/sensiNact-gateway"/>	                    	
-		            		</target>
-			             </configuration>
-			        </execution>
-			     </executions>
-			 </plugin>
 			 <plugin>
-				<groupId>org.codehaus.gmaven</groupId>
-				<artifactId>groovy-maven-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-scm-plugin</artifactId>
+				<version>1.11.2</version>
 				<executions>
 					<execution>
-						<id>copy-distribution-jars</id>
+						<id>checkout-jpath</id>
 						<phase>validate</phase>
 						<goals>
-							<goal>execute</goal>
+							<goal>checkout</goal>
 						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<checkoutDirectory>${project.build.directory}/distribution</checkoutDirectory>
+					<connectionType>connection</connectionType>
+					<scmVersion>da4fd49cf9de6692f6197f24caa58432b9dc4eec</scmVersion>
+					<scmVersionType>revision</scmVersionType>
+					<excludes>.git</excludes>
+				</configuration>
+			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+			    <version>1.8</version>
+				<executions>
+					<execution>
+						<id>createClassesDir</id>
+						<phase>validate</phase>
 						<configuration>
-							<source>
-								String basedir = project.basedir.absolutePath.replace('\\','/');							
-								File distribution = new File(new File(basedir),"target/sensiNact-gateway");	
-								File root = distribution.listFiles()[0];								
-								if(root.exists())
-								{				
-									project.properties.setProperty('rootfile',root.getName());
-								}							
-							</source>
+							<verbose>true</verbose>
+							<target>
+								<mkdir dir="${project.build.directory}/classes" />
+								<mkdir dir="${project.build.directory}/classes/datastore" />
+								<mkdir dir="${project.build.directory}/classes/datastore/keystore" />
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/sensinact-utils/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/sensinact-common/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/sensinact-datastore/sensinact-datastore-api/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/sensinact-core/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/sensinact-generic/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>	
+								<copy todir="${project.build.directory}/classes" >						
+									<fileset dir="${project.build.directory}/distribution/platform/sensinact-generic/src/main/resources/"/>
+								</copy>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/southbound/mqtt/mqtt-utils/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/southbound/mqtt/mqtt-device/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/sensinact-security/sensinact-security-none/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>	
+								<copy todir="${project.build.directory}/classes/META-INF/services" >						
+									<fileset dir="${project.build.directory}/distribution/platform/sensinact-security/sensinact-security-none/src/main/resources/META-INF/services"/>
+								</copy>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/northbound/sensinact-access/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/protocol/http/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/northbound/rest-access/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/northbound/http-tools/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/southbound/mqtt/ttn-device/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/southbound/http/http-device/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/sensinact-application/application-manager/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>		
+								<copy todir="${project.build.directory}/classes" >						
+									<fileset dir="${project.build.directory}/distribution/platform/sensinact-application/application-manager/src/main/resources"/>
+								</copy>	
+								<javac fork="true" executable="${env.JAVA_HOME}/bin/javac"
+									srcdir="${project.build.directory}/distribution/platform/sensinact-application/basic-plugin/src/main/java"
+									destdir="${project.build.directory}/classes/">
+									<classpath refid="maven.compile.classpath" />
+									<classpath location="${project.build.directory}/classes" />
+								</javac>
+								<copy todir="${project.build.directory}/classes" >						
+									<fileset dir="${project.build.directory}/distribution/platform/sensinact-application/basic-plugin/src/main/resources"/>
+								</copy>	
+							</target>
 						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>keystoreCopy</id>
+						<phase>initialize</phase>
+						<configuration>
+							<target description="Copying keystore.jks">
+								<copy file="${project.build.directory}/distribution/platform/sensinact-security/cert/keystore.jks"
+									tofile="${project.build.directory}/classes/datastore/keystore/keystore.jks" />
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-antrun-plugin</artifactId>
-			    <executions>
-			        <execution>
-			            <id>copy-classes</id>
-			            <phase>initialize</phase>
-			            <goals>
-			                <goal>run</goal>
-			            </goals>
-			            <configuration>
-		            		<target>
-		            		    <get src="https://ftp.fau.de/eclipse/sensinact/gateway/snapshot/sensiNact-gateway-2.0-SNAPSHOT-latest.zip"
-		                         dest="${project.build.directory}/"
-		                         verbose="false"
-		                         usetimestamp="true"/>
-		                        <unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/bundle/2/mqtt-utils-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>
-		                        <unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/bundle/2/org.eclipse.paho.client.mqttv3-1.2.2.jar" dest="${project.build.directory}/classes"/>	                    	
-		                        <unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/bundle/3/sensinact-utils-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>	                    	
-		                        <unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/bundle/3/sensinact-common-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>	                    	
-		                        <unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/bundle/3/sensinact-datastore-api-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>	                 	
-		                        <unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/bundle/3/sensinact-security-none-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>	                 	
-		                        <unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/bundle/3/sensinact-core-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>	                 	
-		                        <unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/bundle/3/sensinact-generic-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>                	
-		            			<unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/bundle/3/sensinact-northbound-access-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>	     	
-		            			<unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/load/mqtt-sb/mqtt-device-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>	               	
-		                        <unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/load/application/application-manager-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>	       	
-		                        <unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/load/application/basic-plugin-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>	     
-		            			<unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/load/rest/http-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>
-		            			<unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/load/rest/rest-access-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>
-		            			<unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/load/rest/http-tools-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>
-		            			<unzip src="${project.build.directory}/sensiNact-gateway/${rootfile}/load/ttn-device/thethingsnetwork-device-2.0-SNAPSHOT.jar" dest="${project.build.directory}/classes"/>
-		            			<delete dir="${project.build.directory}/classes/META-INF/maven"/>
-		            			<delete file="${project.build.directory}/classes/META-INF/MANIFEST.MF"/>
-		            			<delete file="${project.build.directory}/classes/META-INF/MANIFEST.MF"/>
-		            			<delete file="${project.build.directory}/classes/META-INF/SELFSIGN.RSA"/>
-		            			<delete file="${project.build.directory}/classes/META-INF/SELFSIGN.SF"/>
-		            			<delete file="${project.build.directory}/classes/META-INF/ECLIPSE_.RSA"/>
-		            			<delete file="${project.build.directory}/classes/META-INF/ECLIPSE_.SF"/>
-		            		</target>
-			             </configuration>
-			        </execution>
-			     </executions>
-			 </plugin>
 			<plugin>
 				<groupId>org.apache.felix</groupId>
 				<artifactId>maven-bundle-plugin</artifactId>
@@ -136,12 +241,14 @@
 					<instructions>
 						<Embed-Dependency>*;scope=compile;inline=true</Embed-Dependency>
 						<Embed-Transitive>false</Embed-Transitive>
+						<Bundle-Activator>org.eclipse.sensinact.gateway.sthbnd.ttn.osgi.TtnActivator</Bundle-Activator>
 						<Export-Package>
 							org.json;version="20080701",
-							org.eclipse.sensinact.gateway.*;version="2.0.0"
+							org.eclipse.sensinact.*;version="2.0.0"
 						</Export-Package>
 						<_nouses>true</_nouses>
 						<DynamicImport-Package>
+							com.sun.net.httpserver,
 							javax.activation,
 							javax.crypto,
 							javax.crypto.interfaces,
@@ -151,14 +258,17 @@
 							javax.mail.internet,
 							javax.naming,
 							javax.naming.directory,
+							javax.net,
 							javax.net.ssl,
 							javax.security.auth.callback,
 							javax.security.auth.x500,
 							javax.servlet,
 							javax.servlet.annotation,
-							javax.servlet.http,javax.xml.parsers
+							javax.servlet.http,
+							javax.xml.parsers
 						</DynamicImport-Package>
 						<Import-Package>
+							org.eclipse.jetty.util,
 							org.eclipse.jetty.websocket.api,
 							org.eclipse.jetty.websocket.api.annotations,
 							org.eclipse.jetty.websocket.servlet,
@@ -172,6 +282,11 @@
 							org.slf4j;version="[1.7,2)",
 							org.xml.sax
 						</Import-Package>
+						<Private-Package>
+							.,
+							datastore.keystore,
+							META-INF.services
+						</Private-Package>
 					</instructions>
 				</configuration>
 			</plugin>

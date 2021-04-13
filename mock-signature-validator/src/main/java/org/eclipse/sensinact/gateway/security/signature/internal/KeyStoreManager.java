@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -35,14 +36,14 @@ public class KeyStoreManager {
     /**
      * Constructor
      *
-     * @param keystoreFile
+     * @param url
      * @param keyStorePassword
      * @throws KeyStoreManagerException
      */
-    public KeyStoreManager(String keystoreFile, String keyStorePassword) throws KeyStoreManagerException {
+    public KeyStoreManager(URL url, String keyStorePassword) throws KeyStoreManagerException {
         try {
             this.keystore = KeyStore.getInstance(KEYSTORE_TYPE);
-            final InputStream iStream = (InputStream) new FileInputStream(keystoreFile);
+            final InputStream iStream = url.openStream();
             keystore.load(iStream, keyStorePassword.toCharArray());
         } catch (Exception e) {
             throw new KeyStoreManagerException(e);
