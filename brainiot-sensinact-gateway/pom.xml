@@ -85,12 +85,11 @@
 				<configuration>
 					<checkoutDirectory>${project.build.directory}/distribution</checkoutDirectory>
 					<connectionType>connection</connectionType>
-					<scmVersion>da4fd49cf9de6692f6197f24caa58432b9dc4eec</scmVersion>
+					<scmVersion>decb274507ae2c7388caaa7db94a6a8aa035a3db</scmVersion>
 					<scmVersionType>revision</scmVersionType>
 					<excludes>.git</excludes>
 				</configuration>
 			</plugin>
-			
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
@@ -101,7 +100,7 @@
 						<phase>validate</phase>
 						<configuration>
 							<verbose>true</verbose>
-							<target>
+							<target>						
 								<mkdir dir="${project.build.directory}/classes" />
 								<mkdir dir="${project.build.directory}/classes/datastore" />
 								<mkdir dir="${project.build.directory}/classes/datastore/keystore" />
@@ -271,6 +270,7 @@
 							org.eclipse.jetty.util,
 							org.eclipse.jetty.websocket.api,
 							org.eclipse.jetty.websocket.api.annotations,
+							org.eclipse.jetty.websocket.api.extensions,
 							org.eclipse.jetty.websocket.servlet,
 							org.osgi.framework;version="[1.8,2)",
 							org.osgi.framework.wiring;version="[1.2,2)",
